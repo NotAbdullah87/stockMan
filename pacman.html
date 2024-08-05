@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+
+    gtag('config', 'UA-142539004-1');
+  </script>
+
+
+  <link rel='shortcut icon' type='image/x-icon' href='favicon.ico'>
+  <link href='https://fonts.googleapis.com/css?family=Press+Start+2P&display=swap' rel='stylesheet'>
+  <link href='https://fonts.googleapis.com/icon?family=Material+Icons' rel='stylesheet'>
+  
+  <script type="module" src='build/app.js'></script>
+  <script type="module" src="/auth/firestore.js"></script>
+  <script type="module" src="/auth/state-change.js"></script>
+  <title>Stock-Man</title>
+  <style>
+    #input-wrapper{
+    padding: 2rem;
+  }
+  #soreForm{
+    text-align: center;
+    padding: 2rem;
+  }
+  #username{
+    outline: 2px solid transparent;
+    font-size: 0.75rem;
+    line-height: 1rem;
+    padding: 0.75 0.25 0.75 0.25;
+    border: 2px solid rgb(105, 0, 0);
+    border-radius: 0.25rem;
+    min-height: 2rem;
+    text-align: center;
+  }
+  #btn-wrapper{
+    padding: 2rem;
+    text-align: center;
+    justify-content: center;
+    gap: 0.75rem;
+  }
+  #btn-wrapper button{
+    align-items: center;
+  background-color: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 0.25rem;
+  box-shadow: rgba(0, 0, 0, 0.02) 0 1px 3px 0;
+  box-sizing: border-box;
+  color: rgba(0, 0, 0, 0.85);
+  cursor: pointer;
+  display: inline-flex;
+  font-family: system-ui, -apple-system, system-ui, "Helvetica Neue", Helvetica,
+    Arial, sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  justify-content: center;
+  line-height: 1.25;
+  margin: 0;
+  min-height: 2rem;
+  padding: 10px calc(1.5rem - 1px);
+  position: relative;
+  text-decoration: none;
+  transition: all 250ms;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  vertical-align: baseline;
+  width: auto;
+  transition: transform .3s ease-in-out;
+  }
+  #btn-wrapper button:hover{
+    
+    background-color: antiquewhite;
+    border: 1px solid grey;
+  }
+  </style>
+</head>
+
+<body>
+  <div id='overflow-mask' class='overflow-mask'>
+    <img id='backdrop' class='backdrop' src='app/style/graphics/backdrop.png'>
+
+    <div id='fps-display' class='fps-display'></div>
+    <div id='preload-div' class='preload-div'></div>
+
+    <div id='main-menu-container' class='main-menu-container'>
+      <img id='logo' class='logo' src='app/style/graphics/pacman_logo.png'>
+      <button id='game-start' class='game-start'>
+        PLAY
+      </button>
+      <a href="/leaderboard.html">
+
+          <button  class=' leaderbrd-btn'>
+            🏆Leaderboard
+          </button>
+      </a>
+      <p style="margin-top: 40px;" id="warning"></p>
+
+
+
+      <!-- ============================================================================================== -->
+
+      <!-- <div id='input-wrapper'>
+        <div>
+          <form
+            
+            id="soreForm">
+            <input type='text' id="username"
+              name='username' placeholder="Enter Username" />
+            <div id='btn-wrapper'>
+              <button id=' input-btn' type='submit'>
+                Save Score
+              </button>
+             <a href="/leaderboard.html">
+
+               <button  type='button' id="leaderboard-btn">
+                🏆Leaderboard
+                </button>
+             </a> 
+
+            </div>
+          </form>
+        </div>
+      </div> -->
+
+      <!-- ============================================================================================ -->
+
+
+
+    </div>
+
+    <div class='header-buttons'>
+      <button>
+        <i id='pause-button' class='material-icons'>
+          pause
+        </i>
+      </button>
+      <button>
+        <i id='sound-button' class='material-icons'></i>
+      </button>
+    </div>
+
+    <div id='paused-text' class='paused-text'>
+      PAUSED
+    </div>
+
+    <div id='game-ui' class='game-ui'>
+      <div id='row-top' class='row top'>
+        <div class='column _25'>
+          <div class='one-up'>1UP</div>
+          <div id='points-display'></div>
+        </div>
+        <div class='column _50'>
+          <div>HIGH SCORE</div>
+          <div id='high-score-display'></div>
+        </div>
+      </div>
+
+      <div id='maze' class='maze'>
+        <img id='maze-img' class='maze-img' src='app/style//graphics/spriteSheets/maze/maze_blue.svg'>
+        <div id='maze-cover' class='maze-cover'></div>
+        <div id='dot-container'></div>
+        <p id='pacman' class='pacman'></p>
+        <p id='pacman-arrow' class='pacman'></p>
+        <p id='clyde' class='ghost'></p>
+        <p id='inky' class='ghost'></p>
+        <p id='pinky' class='ghost'></p>
+        <p id='blinky' class='ghost'></p>
+      </div>
+
+      <div id='bottom-row' class='row bottom'>
+        <div id='extra-lives' class='extra-lives'></div>
+        <div id='fruit-display' class='fruit-display'></div>
+      </div>
+    </div>
+
+    <div id='movement-buttons' class='movement-buttons'>
+      <div class='row'>
+        <button id='button-up' class='button-up'>
+          <i class='material-icons'>keyboard_arrow_up</i>
+        </button>
+      </div>
+      <div class='row'>
+        <button id='button-left' class='button-left'>
+          <i class='material-icons'>keyboard_arrow_left</i>
+        </button>
+        <button id='button-right' class='button-right'>
+          <i class='material-icons'>keyboard_arrow_right</i>
+        </button>
+      </div>
+      <div class='row'>
+        <button id='button-down' class='button-down'>
+          <i class='material-icons'>keyboard_arrow_down</i>
+        </button>
+      </div>
+    </div>
+
+    <div id='left-cover' class='loading-cover left'></div>
+    <div id='right-cover' class='loading-cover right'></div>
+    <div id='loading-container' class='loading-container'>
+      <div id='loading-pacman' class='loading-pacman'></div>
+      <div id='loading-dot-mask' class='loading-dot-mask'></div>
+      <div class='loading-dot _5'></div>
+      <div class='loading-dot _10'></div>
+      <div class='loading-dot _15'></div>
+      <div class='loading-dot _20'></div>
+      <div class='loading-dot _25'></div>
+      <div class='loading-dot _30'></div>
+      <div class='loading-dot _35'></div>
+      <div class='loading-dot _40'></div>
+      <div class='loading-dot _45'></div>
+      <div class='loading-dot _50'></div>
+      <div class='loading-dot _55'></div>
+      <div class='loading-dot _60'></div>
+      <div class='loading-dot _65'></div>
+      <div class='loading-dot _70'></div>
+      <div class='loading-dot _75'></div>
+      <div class='loading-dot _80'></div>
+      <div class='loading-dot _85'></div>
+      <div class='loading-dot _90'></div>
+      <div class='loading-dot _95'></div>
+    </div>
+
+    <div id='error-message' class='error-message'>
+      <div class='header'>
+        <div>OOPS!</div>
+        <div class='error-pacman'></div>
+      </div>
+      <div class='body'>
+        We were unable to load the images/sounds needed to play the game.</br></br>
+
+        This could be due to a poor connection, a strict network policy, or
+        by playing on an unsupported browser.
+      </div>
+    </div>
+
+    <!-- ================================================================== -->
+
+
+
+ 
+
+
+    
+    <script>
+      window.addEventListener("message", function(event) {
+        if (event.data.loggedIn === false) {
+          alert("Please log in to play the game.");
+          // You can redirect the user to the login page or show a login prompt
+          window.location.href = "https://www.realityheadquarters.com/account/login"; // Change this URL to your login page
+        }
+      });
+    </script>
+  </div>
+</body>
+
+</html>
